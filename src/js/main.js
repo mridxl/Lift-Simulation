@@ -1,4 +1,6 @@
 const MAX_DISTANCE = 100000000;
+const SPEED_PER_FLOOR = 2000;
+const DOOR_OPEN_TIME = 2500;
 
 // LiftSystem class
 class LiftSystem {
@@ -14,18 +16,27 @@ class LiftSystem {
 		this.pendingRequests = []; // global(kinda) request queue for requests that are not yet assigned to any lift
 	}
 
-	requestLift(floor) {
-		// don't assign the request if it's already in the pendingRequests queue
-		if (this.pendingRequests.includes(floor)) {
+	requestLift(floor, direction) {
+		// don't assign the request if it's already in the queue
+		if (
+			this.liftState.some((lift) =>
+				lift.requestQueue.some(
+					(req) => req.floor === floor && req.direction === direction
+				)
+			) ||
+			this.pendingRequests.some(
+				(req) => req.floor === floor && req.direction === direction
+			)
+		) {
 			return;
 		}
 
 		const liftToAssign = this.findClosestLift(floor);
 		if (liftToAssign === -1) {
-			if (!this.pendingRequests.includes(floor))
-				this.pendingRequests.push(floor);
+			if (!this.pendingRequests.some((req) => req.floor === floor))
+				this.pendingRequests.push({ floor, direction });
 		} else {
-			this.liftState[liftToAssign].requestQueue.push(floor);
+			this.liftState[liftToAssign].requestQueue.push({ floor, direction });
 			this.moveLift(liftToAssign);
 		}
 	}
@@ -52,7 +63,7 @@ class LiftSystem {
 		const liftElement = document.querySelector(`.lift[data-id="${liftIndex}"]`);
 
 		while (liftState.requestQueue.length > 0) {
-			const targetFloor = liftState.requestQueue[0];
+			const targetFloor = liftState.requestQueue[0].floor;
 			const currentFloor = liftState.currentFloor;
 			const floorsToMove = Math.abs(targetFloor - currentFloor);
 
@@ -63,13 +74,13 @@ class LiftSystem {
 				setTimeout(() => {
 					liftState.currentFloor = targetFloor;
 					resolve();
-				}, floorsToMove * 2000);
+				}, floorsToMove * SPEED_PER_FLOOR);
 			});
 
 			liftElement.style.transition = '';
 
 			await this.operateDoors(liftElement, 'open');
-			await new Promise((resolve) => setTimeout(resolve, 2500));
+			await new Promise((resolve) => setTimeout(resolve, DOOR_OPEN_TIME));
 			await this.operateDoors(liftElement, 'close');
 
 			liftState.requestQueue.shift();
@@ -80,13 +91,13 @@ class LiftSystem {
 
 	checkPendingRequests() {
 		if (this.pendingRequests.length > 0) {
-			const requestedFloor = this.pendingRequests.shift();
-			const availableLift = this.findClosestLift(requestedFloor);
+			const requestedRequest = this.pendingRequests.shift();
+			const availableLift = this.findClosestLift(requestedRequest.floor);
 			if (availableLift !== -1) {
-				this.liftState[availableLift].requestQueue.push(requestedFloor);
+				this.liftState[availableLift].requestQueue.push(requestedRequest);
 				this.moveLift(availableLift);
 			} else {
-				this.pendingRequests.unshift(requestedFloor);
+				this.pendingRequests.unshift(requestedRequest);
 			}
 		}
 	}
@@ -109,6 +120,11 @@ class LiftSystem {
 
 // UI Logic
 document.addEventListener('DOMContentLoaded', () => {
+	isMobile() &&
+		alert(
+			'Please use a desktop device for a better experience. The number of lifts will be limited to 5 for mobile devices.'
+		);
+
 	const submitButton = document.getElementById('submit');
 	const liftInput = document.getElementById('lifts');
 	const floorInput = document.getElementById('floors');
@@ -126,6 +142,11 @@ document.addEventListener('DOMContentLoaded', () => {
 			alert(
 				'Please enter a valid number of lifts less than 10 and floors less than 10 to proceed with the simulation'
 			);
+			return;
+		}
+
+		if (isMobile() && lifts > 5) {
+			alert('Please enter a number of lifts less than 5 for mobile devices.');
 			return;
 		}
 
@@ -181,7 +202,7 @@ function generateButtons(liftSystem, floorElement, floorIndex, totalFloors) {
 	upButton.innerText = '▲';
 	upButton.dataset.floor = totalFloors - floorIndex - 1;
 	upButton.addEventListener('click', () => {
-		liftSystem.requestLift(totalFloors - floorIndex - 1);
+		liftSystem.requestLift(totalFloors - floorIndex - 1, 'up');
 	});
 
 	const downButton = document.createElement('button');
@@ -189,7 +210,7 @@ function generateButtons(liftSystem, floorElement, floorIndex, totalFloors) {
 	downButton.innerText = '▼';
 	downButton.dataset.floor = totalFloors - floorIndex - 1;
 	downButton.addEventListener('click', () => {
-		liftSystem.requestLift(totalFloors - floorIndex - 1);
+		liftSystem.requestLift(totalFloors - floorIndex - 1, 'down');
 	});
 
 	floorElement.append(btnContainer);
@@ -206,4 +227,8 @@ function generateDoors(liftElement) {
 	rightDoor.classList.add('door', 'right');
 
 	liftElement.append(leftDoor, rightDoor);
+}
+
+function isMobile() {
+	return window.innerWidth < 550;
 }

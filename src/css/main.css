@@ -42,7 +42,7 @@ body {
 	justify-content: center;
 	width: 100%;
 	position: absolute;
-	top: 30%;
+	top: 20%;
 	transition: all 1s ease-in-out;
 }
 
@@ -65,7 +65,7 @@ h1 {
 }
 
 #screen-one {
-	padding-top: 10em;
+	padding-top: 5em;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
@@ -74,6 +74,7 @@ h1 {
 }
 
 .input-container {
+	padding-top: 2em;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	row-gap: 1em;
@@ -82,8 +83,11 @@ h1 {
 
 p {
 	font-size: 1.5em;
-
 	text-align: center;
+}
+
+.subtext {
+	font-size: 1em;
 }
 
 .label {
@@ -124,7 +128,11 @@ input {
 	width: 80%;
 }
 
-/* TODO change width for responsive */
+@media screen and (max-width: 550px) {
+	#screen-two {
+		width: 65%;
+	}
+}
 
 #floor-container {
 	display: flex;
