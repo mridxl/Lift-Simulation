@@ -15,13 +15,21 @@ class LiftSystem {
 	}
 
 	requestLift(floor) {
+		// don't assign the request if it's already in the pendingRequests queue or in a lift's requestQueue
+		if (
+			this.pendingRequests.includes(floor) ||
+			this.liftState.some((lift) => lift.requestQueue.includes(floor))
+		) {
+			return;
+		}
+
 		const liftToAssign = this.findClosestLift(floor);
 		if (liftToAssign === -1) {
 			if (!this.pendingRequests.includes(floor))
 				this.pendingRequests.push(floor);
 		} else {
 			this.liftState[liftToAssign].requestQueue.push(floor);
-			// TODO move lift to floor
+			this.moveLift(liftToAssign);
 		}
 	}
 
@@ -29,7 +37,7 @@ class LiftSystem {
 		let closestLift = -1;
 		let minDistance = MAX_DISTANCE;
 
-		for (let i = 0; i < this.totalFloors; i++) {
+		for (let i = 0; i < this.totalLifts; i++) {
 			const distance = Math.abs(this.liftState[i].currentFloor - floor);
 			if (
 				distance < minDistance &&
@@ -40,6 +48,65 @@ class LiftSystem {
 			}
 		}
 		return closestLift; //returns index of lift closest of floor
+	}
+
+	async moveLift(liftIndex) {
+		const liftState = this.liftState[liftIndex];
+		const liftElement = document.querySelector(`.lift[data-id="${liftIndex}"]`);
+
+		while (liftState.requestQueue.length > 0) {
+			const targetFloor = liftState.requestQueue[0];
+			const currentFloor = liftState.currentFloor;
+			const floorsToMove = Math.abs(targetFloor - currentFloor);
+
+			await new Promise((resolve) => {
+				liftElement.style.transition = `bottom ${floorsToMove * 2}s linear`;
+				console.log('Moving Lift', liftIndex, 'to Floor', targetFloor);
+				liftElement.style.bottom = `${targetFloor * (100 / this.totalFloors)}%`;
+				setTimeout(() => {
+					liftState.currentFloor = targetFloor;
+					resolve();
+				}, floorsToMove * 2000);
+			});
+
+			liftElement.style.transition = '';
+
+			await this.operateDoors(liftElement, 'open');
+			await new Promise((resolve) => setTimeout(resolve, 2500));
+			await this.operateDoors(liftElement, 'close');
+
+			liftState.requestQueue.shift();
+		}
+
+		this.checkPendingRequests();
+	}
+
+	checkPendingRequests() {
+		if (this.pendingRequests.length > 0) {
+			const requestedFloor = this.pendingRequests.shift();
+			const availableLift = this.findClosestLift(requestedFloor);
+			if (availableLift !== -1) {
+				this.liftState[availableLift].requestQueue.push(requestedFloor);
+				this.moveLift(availableLift);
+			} else {
+				this.pendingRequests.unshift(requestedFloor);
+			}
+		}
+	}
+
+	async operateDoors(liftElement, todo) {
+		const leftDoor = liftElement.querySelector('.left');
+		const rightDoor = liftElement.querySelector('.right');
+
+		if (todo === 'open') {
+			leftDoor.classList.add('open');
+			rightDoor.classList.add('open');
+		} else {
+			leftDoor.classList.remove('open');
+			rightDoor.classList.remove('open');
+		}
+
+		await new Promise((resolve) => setTimeout(resolve, 2500));
 	}
 }
 
@@ -72,12 +139,12 @@ document.addEventListener('DOMContentLoaded', () => {
 		document.getElementById('screen-two').style.display = 'flex';
 		document.getElementById('header-container').classList.add('moved');
 
-		generateFloors(floors);
+		generateFloors(liftSystem, floors);
 		generateLifts(lifts, floors);
 	});
 });
 
-function generateFloors(floors) {
+function generateFloors(liftSystem, floors) {
 	const floorContainer = document.getElementById('floor-container');
 	for (let i = 0; i < floors; i++) {
 		const floorElement = document.createElement('div');
@@ -90,7 +157,7 @@ function generateFloors(floors) {
 
 		floorElement.append(floorLabel);
 		floorContainer.append(floorElement);
-		generateButtons(floorElement);
+		generateButtons(liftSystem, floorElement, i, floors);
 	}
 }
 
@@ -99,6 +166,7 @@ function generateLifts(lifts, floors) {
 	for (let i = 0; i < lifts; i++) {
 		const liftElement = document.createElement('div');
 		liftElement.classList.add('lift');
+		liftElement.dataset.id = i;
 		liftElement.style.height = `${100 / (floors + 1)}%`;
 		liftElement.style.width = `${100 / (lifts + 5)}%`;
 		liftElement.style.left = `${((i + 0.2) * 100) / lifts}%`;
@@ -107,20 +175,25 @@ function generateLifts(lifts, floors) {
 	}
 }
 
-function generateButtons(floorElement) {
+function generateButtons(liftSystem, floorElement, floorIndex, totalFloors) {
 	const btnContainer = document.createElement('div');
 	btnContainer.classList.add('button-container');
 
 	const upButton = document.createElement('button');
 	upButton.classList.add('up', 'lift-button');
 	upButton.innerText = '▲';
+	upButton.dataset.floor = totalFloors - floorIndex - 1;
 	upButton.addEventListener('click', () => {
-		openDoors(document.querySelector('.lift'));
+		liftSystem.requestLift(totalFloors - floorIndex - 1);
 	});
 
 	const downButton = document.createElement('button');
 	downButton.classList.add('down', 'lift-button');
 	downButton.innerText = '▼';
+	downButton.dataset.floor = totalFloors - floorIndex - 1;
+	downButton.addEventListener('click', () => {
+		liftSystem.requestLift(totalFloors - floorIndex - 1);
+	});
 
 	floorElement.append(btnContainer);
 	btnContainer.append(upButton, downButton);
@@ -134,18 +207,4 @@ function generateDoors(liftElement) {
 	rightDoor.classList.add('door', 'right');
 
 	liftElement.append(leftDoor, rightDoor);
-}
-
-function openDoors(liftElement) {
-	console.log('Opening');
-	const leftDoor = liftElement.querySelector('.left');
-	const rightDoor = liftElement.querySelector('.right');
-
-	leftDoor.classList.add('open');
-	rightDoor.classList.add('open');
-
-	setTimeout(() => {
-		leftDoor.classList.remove('open');
-		rightDoor.classList.remove('open');
-	}, 2500);
 }
