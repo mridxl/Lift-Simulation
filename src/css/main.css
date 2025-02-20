@@ -200,8 +200,16 @@ input {
 	background-color: #04b301a9;
 }
 
+.up:last-child {
+	margin: 0 1.5em;
+}
+
 .down {
 	background-color: #f9ae00;
+}
+
+.down:first-child {
+	margin: 0 1.5em;
 }
 
 #lift-container {

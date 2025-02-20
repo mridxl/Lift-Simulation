@@ -193,7 +193,9 @@ function generateButtons(liftSystem, floorElement, floorIndex, totalFloors) {
 	});
 
 	floorElement.append(btnContainer);
-	btnContainer.append(upButton, downButton);
+	if (floorIndex === 0) btnContainer.append(upButton);
+	else if (floorIndex === totalFloors - 1) btnContainer.append(downButton);
+	else btnContainer.append(upButton, downButton);
 }
 
 function generateDoors(liftElement) {
