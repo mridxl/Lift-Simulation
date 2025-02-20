@@ -15,11 +15,8 @@ class LiftSystem {
 	}
 
 	requestLift(floor) {
-		// don't assign the request if it's already in the pendingRequests queue or in a lift's requestQueue
-		if (
-			this.pendingRequests.includes(floor) ||
-			this.liftState.some((lift) => lift.requestQueue.includes(floor))
-		) {
+		// don't assign the request if it's already in the pendingRequests queue
+		if (this.pendingRequests.includes(floor)) {
 			return;
 		}
 
