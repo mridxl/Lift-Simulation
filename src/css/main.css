@@ -208,12 +208,20 @@ input {
 	background-color: #04b301a9;
 }
 
+.up.requested {
+	background-color: #124a12;
+}
+
 .up:last-child {
 	margin: 0 1.5em;
 }
 
 .down {
 	background-color: #f9ae00;
+}
+
+.down.requested {
+	background-color: #7b5d18;
 }
 
 .down:first-child {

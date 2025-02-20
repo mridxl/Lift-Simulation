@@ -17,6 +17,7 @@ class LiftSystem {
 	}
 
 	requestLift(floor, direction) {
+		switchButtons(floor, direction, true);
 		// don't assign the request if it's already in the queue
 		if (
 			this.liftState.some((lift) =>
@@ -85,6 +86,7 @@ class LiftSystem {
 			await new Promise((resolve) => setTimeout(resolve, DOOR_OPEN_TIME));
 			await this.operateDoors(liftElement, 'close');
 
+			switchButtons(targetFloor, liftState.requestQueue[0].direction, false);
 			liftState.requestQueue.shift();
 		}
 
@@ -233,4 +235,28 @@ function generateDoors(liftElement) {
 
 function isMobile() {
 	return window.innerWidth < 550;
+}
+
+function switchButtons(floor, direction, isRequested) {
+	const el = document.querySelectorAll(`.lift-button[data-floor="${floor}"]`);
+
+	if (isRequested && floor !== 0) {
+		if (direction === 'up') {
+			el[0].classList.add('requested');
+		} else {
+			el[1].classList.add('requested');
+		}
+	} else if (floor !== 0) {
+		if (direction === 'up') {
+			el[0].classList.remove('requested');
+		} else {
+			el[1].classList.remove('requested');
+		}
+	} else {
+		if (isRequested) {
+			el[0].classList.add('requested');
+		} else {
+			el[0].classList.remove('requested');
+		}
+	}
 }
