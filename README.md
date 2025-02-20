@@ -1,21 +1,40 @@
-# Lift-Simulation
-Create a web app where you can simulate lift mechanics for a client
+# Lift Simulation  
 
-# UI Example
-![Lift Simulation Example](Lift-Simulation-Example.png "Lift Simulation Example")
+A web app that simulates lift mechanics, allowing users to visualize and interact with elevator movements. Built with JavaScript, HTML, and CSS, this project explores OOP concepts, CSS transitions, and JS objects/prototypes.  
 
-# Requirements
-  1. Have a page where you input the number of floors and lifts from the user
-  2. An interactive UI is generated, where we have visual depictions of lifts and buttons on floors
-  3. Upon clicking a particular button on the floor, a lift goes to that floor
+🔗 **Live Demo:** [Lift Simulation](https://mridxl-lift-simulation.vercel.app/)  
 
-  Milestone 1:
-   - Data store that contains the state of your application data
-   - JS Engine that is the controller for which lift goes where
-   - Dumb UI that responds to controller's commands
-   
-  Milestone 2:
-   - Lift having doors open in 2.5s, then closing in another 2.5s
-   - Lift moving at 2s per floor
-   - Lift stopping at every floor where it was called
-   - Mobile friendly design
+## 📌 Features  
+
+✅ **Dynamic Input** – Users can specify the number of floors and lifts.  
+✅ **Interactive UI** – Floors display call buttons, and lifts respond to requests.  
+✅ **Realistic Lift Behavior** – Lifts move intelligently to requested floors.  
+✅ **Smooth Animations** – Doors open (2.5s), close (2.5s), and lift moves at 2s per floor.  
+✅ **Optimized Lift Allocation** – Lifts are assigned efficiently to minimize wait times.  
+✅ **Stops at Multiple Requests** – Lifts stop at every floor where they were called.  
+✅ **Mobile-Friendly** – Responsive design for a seamless experience on all devices.  
+
+## 🎯 Learning Outcomes  
+
+This project helped me gain a deeper understanding of:  
+- **Object-Oriented Programming (OOP) in JavaScript**  
+- **Handling state using JS objects and prototypes**  
+- **CSS transitions and animations for smooth UI interactions**  
+- **Optimizing lift movement logic for realistic simulation**  
+
+## 📌 How It Works  
+
+1. Users enter the number of floors and lifts.  
+2. A UI is generated with buttons on each floor and lift indicators.  
+3. Clicking a floor button calls the nearest available lift.  
+4. The lift moves, stops at requested floors, and opens/closes doors accordingly.  
+
+## 📷 Preview  
+
+![Lift Simulation Example](https://github.com/user-attachments/assets/a8f88736-25f6-4e7d-a9b5-c4278d6bca0a)
+
+## 🚀 Future Improvements  
+
+- **Better Lift Allocation Algorithm** – Optimize for multiple simultaneous requests.  
+- **Sound Effects & UI Enhancements** – Improve user experience.  
+- **Local Storage Support** – Save state between refreshes.  
