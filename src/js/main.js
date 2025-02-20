@@ -17,7 +17,6 @@ class LiftSystem {
 	}
 
 	requestLift(floor, direction) {
-		switchButtons(floor, direction, true);
 		// don't assign the request if it's already in the queue
 		if (
 			this.liftState.some((lift) =>
@@ -32,6 +31,8 @@ class LiftSystem {
 			return;
 		}
 
+		switchButtons(floor, direction, true);
+		
 		const liftToAssign = this.findClosestLift(floor);
 		if (liftToAssign === -1) {
 			if (!this.pendingRequests.some((req) => req.floor === floor))
