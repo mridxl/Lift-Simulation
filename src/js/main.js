@@ -1,5 +1,5 @@
 const MAX_DISTANCE = 100000000;
-const SPEED_PER_FLOOR = 2000;
+const SPEED_PER_FLOOR = 2;
 const DOOR_OPEN_TIME = 2500;
 
 // LiftSystem class
@@ -68,13 +68,15 @@ class LiftSystem {
 			const floorsToMove = Math.abs(targetFloor - currentFloor);
 
 			await new Promise((resolve) => {
-				liftElement.style.transition = `bottom ${floorsToMove * 2}s linear`;
+				liftElement.style.transition = `bottom ${
+					floorsToMove * SPEED_PER_FLOOR
+				}s linear`;
 				console.log('Moving Lift', liftIndex, 'to Floor', targetFloor);
 				liftElement.style.bottom = `${targetFloor * (100 / this.totalFloors)}%`;
 				setTimeout(() => {
 					liftState.currentFloor = targetFloor;
 					resolve();
-				}, floorsToMove * SPEED_PER_FLOOR);
+				}, floorsToMove * SPEED_PER_FLOOR * 1000);
 			});
 
 			liftElement.style.transition = '';
@@ -112,9 +114,9 @@ class LiftSystem {
 		} else {
 			leftDoor.classList.remove('open');
 			rightDoor.classList.remove('open');
-		}
 
-		await new Promise((resolve) => setTimeout(resolve, 2500));
+			await new Promise((resolve) => setTimeout(resolve, DOOR_OPEN_TIME));
+		}
 	}
 }
 
