@@ -72,7 +72,7 @@ class LiftSystem {
 				liftElement.style.transition = `bottom ${
 					floorsToMove * SPEED_PER_FLOOR
 				}s linear`;
-				console.log('Moving Lift', liftIndex, 'to Floor', targetFloor);
+				console.log('Moving Lift', liftIndex + 1, 'to Floor', targetFloor);
 				liftElement.style.bottom = `${targetFloor * (100 / this.totalFloors)}%`;
 				setTimeout(() => {
 					liftState.currentFloor = targetFloor;
@@ -153,10 +153,7 @@ class LiftSystem {
 
 // UI Logic
 document.addEventListener('DOMContentLoaded', () => {
-	isMobile() &&
-		alert(
-			'Please use a desktop device for a better experience. The number of lifts will be limited to 5 for mobile devices.'
-		);
+	isMobile() && alert('Please use a desktop device for a better experience.');
 
 	const submitButton = document.getElementById('submit');
 	const liftInput = document.getElementById('lifts');
@@ -175,11 +172,6 @@ document.addEventListener('DOMContentLoaded', () => {
 			alert(
 				'Please enter a valid number of lifts less than 10 and floors less than 10 to proceed with the simulation'
 			);
-			return;
-		}
-
-		if (isMobile() && lifts > 5) {
-			alert('Please enter a number of lifts less than 5 for mobile devices.');
 			return;
 		}
 
