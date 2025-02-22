@@ -31,8 +31,7 @@ class LiftSystem {
 			return;
 		}
 
-		switchButtons(floor, direction, true);
-		
+		this.switchButtons(floor, direction, true);
 		const liftToAssign = this.findClosestLift(floor);
 		if (liftToAssign === -1) {
 			if (!this.pendingRequests.some((req) => req.floor === floor))
@@ -87,7 +86,11 @@ class LiftSystem {
 			await new Promise((resolve) => setTimeout(resolve, DOOR_OPEN_TIME));
 			await this.operateDoors(liftElement, 'close');
 
-			switchButtons(targetFloor, liftState.requestQueue[0].direction, false);
+			this.switchButtons(
+				targetFloor,
+				liftState.requestQueue[0].direction,
+				false
+			);
 			liftState.requestQueue.shift();
 		}
 
@@ -119,6 +122,31 @@ class LiftSystem {
 			rightDoor.classList.remove('open');
 
 			await new Promise((resolve) => setTimeout(resolve, DOOR_OPEN_TIME));
+		}
+	}
+
+	switchButtons(floor, direction, isRequested) {
+		const el = document.querySelectorAll(`.lift-button[data-floor="${floor}"]`);
+		if (el.length === 2) {
+			if (isRequested) {
+				if (direction === 'up') {
+					el[0].classList.add('requested');
+				} else {
+					el[1].classList.add('requested');
+				}
+			} else {
+				if (direction === 'up') {
+					el[0].classList.remove('requested');
+				} else {
+					el[1].classList.remove('requested');
+				}
+			}
+		} else {
+			if (isRequested) {
+				el[0].classList.add('requested');
+			} else {
+				el[0].classList.remove('requested');
+			}
 		}
 	}
 }
@@ -236,28 +264,4 @@ function generateDoors(liftElement) {
 
 function isMobile() {
 	return window.innerWidth < 550;
-}
-
-function switchButtons(floor, direction, isRequested) {
-	const el = document.querySelectorAll(`.lift-button[data-floor="${floor}"]`);
-
-	if (isRequested && floor !== 0) {
-		if (direction === 'up') {
-			el[0].classList.add('requested');
-		} else {
-			el[1].classList.add('requested');
-		}
-	} else if (floor !== 0) {
-		if (direction === 'up') {
-			el[0].classList.remove('requested');
-		} else {
-			el[1].classList.remove('requested');
-		}
-	} else {
-		if (isRequested) {
-			el[0].classList.add('requested');
-		} else {
-			el[0].classList.remove('requested');
-		}
-	}
 }
