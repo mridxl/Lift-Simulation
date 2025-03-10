@@ -34,7 +34,7 @@ class LiftSystem {
 		this.switchButtons(floor, direction, true);
 		const liftToAssign = this.findClosestLift(floor);
 		if (liftToAssign === -1) {
-			if (!this.pendingRequests.some((req) => req.floor === floor))
+			if (!this.pendingRequests.some((req) => req.floor === floor && req.direction === direction))
 				this.pendingRequests.push({ floor, direction });
 		} else {
 			this.liftState[liftToAssign].requestQueue.push({ floor, direction });
@@ -168,9 +168,9 @@ document.addEventListener('DOMContentLoaded', () => {
 			);
 			return;
 		}
-		if (lifts > 10 || floors > 10 || lifts <= 0 || floors < 2) {
+		if (lifts > 12 || floors > 12 || lifts <= 0 || floors <= 0) {
 			alert(
-				'Please enter a valid number of lifts less than 10 and floors less than 10 to proceed with the simulation'
+				'Please enter a valid number of lifts and floors (greater than 0 and less than 12) to proceed with the simulation'
 			);
 			return;
 		}
