@@ -1,6 +1,6 @@
 # Lift Simulation  
 
-A web app that simulates lift mechanics, allowing users to visualize and interact with elevator movements. Built with JavaScript, HTML, and CSS, this project explores OOP concepts, CSS transitions, and JS objects/prototypes.  
+A web app that simulates lift mechanics, allowing users to visualize and interact with elevator movements. Built with JavaScript, HTML, and CSS, this project explores OOP concepts, CSS transitions, and JS objects/prototypes. This is my solution for [RDS lift simulation assignment](https://github.com/Real-Dev-Squad/Lift-Simulation)
 
 🔗 **Live Demo:** [Lift Simulation](https://mridxl-lift-simulation.vercel.app/)  
 
